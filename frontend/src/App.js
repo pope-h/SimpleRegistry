@@ -13,7 +13,7 @@ function App() {
     await window.ethereum.request({ method: "eth_requestAccounts" });
   }
 
-  async function setNameAndAge() {
+  async function inputName() {
     if (typeof window.ethereum !== "undefined") {
       await requestAccount();
       const provider = new ethers.BrowserProvider(window.ethereum);
@@ -26,10 +26,33 @@ function App() {
 
       try {
         await contract.updateName(name);
-        await contract.updateAge(age);
-        console.log("Name and age set successfully");
+        setName("");
+        console.log("Name has been set successfully");
       } catch (error) {
-        console.error("Error setting name and age:", error);
+        console.error("Error setting name:", error);
+      }
+    } else {
+      console.error("Metamask not installed");
+    }
+  }
+
+  async function inputAge() {
+    if (typeof window.ethereum !== "undefined") {
+      await requestAccount();
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+
+      try {
+        await contract.updateAge(age);
+        setAge("");
+        console.log("Age has been set successfully");
+      } catch (error) {
+        console.error("Error setting age:", error);
       }
     } else {
       console.error("Metamask not installed");
@@ -61,36 +84,52 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen space-y-4">
-      <div className="flex space-x-4">
-        <input
-          type="text"
-          placeholder="Enter name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="border border-gray-300 rounded px-4 py-2"
-        />
-        <input
-          type="number"
-          placeholder="Enter age"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          className="border border-gray-300 rounded px-4 py-2"
-        />
+    <div className="flex justify-center bg-gray-200 items-center h-screen space-y-4">
+      <div className="border-2 bg-white text-black w-fit h-fit p-8 flex flex-col gap-4">
+        <div className="flex flex-col">
+          <h2 className="font-medium text-2xl font-serif">Name</h2>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Enter name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="border border-gray-300 text-gray-900 text-lg rounded px-4 py-2"
+            />
+            <button
+              onClick={inputName}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-28 rounded"
+            >
+              Set Name
+            </button>
+          </div>
+        </div>
+        <div className="flex flex-col">
+          <h2 className="font-medium text-2xl font-serif">Age</h2>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              placeholder="Enter age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              className="border border-gray-300 text-gray-900 text-lg rounded px-4 py-2"
+            />
+            <button
+              onClick={inputAge}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-28 rounded"
+            >
+              Set Age
+            </button>
+          </div>
+        </div>
         <button
-          onClick={setNameAndAge}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={getDetails}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
         >
-          Set Name & Age
+          Get Details
         </button>
+        <div className="font-semibold text-2xl font-serif text-center">{details}</div>
       </div>
-      <button
-        onClick={getDetails}
-        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Get Details
-      </button>
-      <div className="text-lg">{details}</div>
     </div>
   );
 }
